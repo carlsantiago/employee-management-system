@@ -1,0 +1,26 @@
+{
+  "name": "week-12",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/carlsantiago/employee-tracker.git"
+  },
+  "author": "Carl Santiago",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/carlsantiago/employee-tracker/issues"
+  },
+  "homepage": "https://github.com/carlsantiago/employee-tracker#readme",
+  "dependencies": {
+    "console-table-printer": "^2.10.0",
+    "dotenv": "^10.0.0",
+    "inquirer": "^8.2.0",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.12.0-alpha.1"
+  }
+}
