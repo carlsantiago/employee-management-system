@@ -20,7 +20,6 @@
     "console-table-printer": "^2.10.0",
     "dotenv": "^10.0.0",
     "inquirer": "^8.2.0",
-    "mysql2": "^2.3.3",
-    "sequelize": "^6.12.0-alpha.1"
+    "mysql2": "^2.3.3"
   }
 }

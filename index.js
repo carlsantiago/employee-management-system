@@ -1,21 +1,9 @@
 const inquirer = require('inquirer')
-const mysql = require('mysql2');
 require('dotenv').config();
-const { printTable } = require('console-table-printer');
+//figlet
 
-const viewAllEmployees = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department , role.salary, CONCAT (manager.first_name, " ", manager.last_name) AS manager FROM employee LEFT JOIN role ON employee.id = role.id LEFT JOIN department ON role.department_id = department.id LEFT JOIN employee manager ON employee.manager_id = manager.id;`
+const query = require ('./lib/query');
 
-const db = mysql.createConnection(
-    {
-      host: 'localhost',
-      // MySQL username,
-      user: process.env.DB_USER,
-      // TODO: Add MySQL password here
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME
-    },
-    console.log(`Connected to the database.`)
-  );
 
 const askAgain = () => {
     inquirer
@@ -25,8 +13,7 @@ const askAgain = () => {
             name: 'again',
             message: `Would you like to continue?`,
             choices: [`Yes`, `No`]
-        }
-    ])
+    }])   
         .then(({again}) => {
             if (again === `Yes`) {
                 userPrompt();
@@ -35,6 +22,7 @@ const askAgain = () => {
             }
         })
 }
+
 const userPrompt =  () => {
      inquirer
     .prompt([
@@ -53,20 +41,24 @@ const userPrompt =  () => {
                         `Add Role`
                     ]}
     ])
-        .then(({userSelect}) => {
+        .then(async ({userSelect}) => {
             if (userSelect === `View All Employees`){
-                viewEmployees();
+                await viewAllEmployees()
+                askAgain();
             }
-        })
-    
-}
+            if (userSelect === `View All Employees By Department`){
+                await viewEmpByDept()
+                askAgain();
+            }
+            if (userSelect === `View All Employees By Manager`){
+                await viewEmpByMgr()
+                askAgain();
+            }
+            if (userSelect === `Add Employee`){
+                await addEmp()
 
-viewEmployees = () => {
-    db.query(viewAllEmployees, (err, rows) => {
-        printTable(rows);
-        askAgain();
-        });
+            }
+        }) 
 }
-
 
 userPrompt();
