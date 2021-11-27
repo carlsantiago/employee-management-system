@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/carlsantiago/employee-tracker#readme",
   "dependencies": {
+    "colors": "^1.4.0",
     "console-table-printer": "^2.10.0",
     "dotenv": "^10.0.0",
     "figlet": "^1.5.2",
