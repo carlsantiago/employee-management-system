@@ -1,8 +1,35 @@
 const inquirer = require('inquirer')
 require('dotenv').config();
+var figlet = require('figlet');
+const { addEmp } = require('./lib/query');
 //figlet
+require ('./lib/query');
 
-const query = require ('./lib/query');
+ init = () => new Promise((resolve, reject) => {{
+    figlet.text('Employee Tracker', {
+    font: 'ANSI Shadow',
+    horizontalLayout: 'default',
+    verticalLayout: 'default',
+    width: 80,
+    whitespaceBreak: true
+}, function(err, data) {
+    if (err) {
+        console.log('Something went wrong...');
+        console.dir(err);
+        return;
+    }
+    console.log('');
+    console.log(data);
+    userPrompt();
+}), (err, res) => {
+    if (err) {
+        return reject(err)
+    }else{
+  
+        return resolve(res)
+    }
+    };
+}});
 
 
 const askAgain = () => {
@@ -22,6 +49,7 @@ const askAgain = () => {
             }
         })
 }
+
 
 const userPrompt =  () => {
      inquirer
@@ -55,10 +83,11 @@ const userPrompt =  () => {
                 askAgain();
             }
             if (userSelect === `Add Employee`){
-                await addEmp()
-
+                await addEmp();
+                askAgain();
             }
         }) 
 }
 
-userPrompt();
+
+init();
