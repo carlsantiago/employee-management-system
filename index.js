@@ -13,14 +13,14 @@ const db = mysql.createConnection(
       database: process.env.DB_NAME
     },
     console.log(`Connected to the database.`.black.bgGreen)
-  );
+);
 
-init = () => new Promise((resolve, reject) => {{
-    figlet.text('Employee Tracker', {
-        font: 'ANSI Shadow',
+init = () => {
+    figlet.text('Employee Management System', {
+        font: 'Calvin S',
         horizontalLayout: 'default',
         verticalLayout: 'default',
-        width: 80,
+        width: 120,
         whitespaceBreak: true
         }, function(err, data) {
             if (err) {
@@ -31,14 +31,8 @@ init = () => new Promise((resolve, reject) => {{
             console.log('');
             console.log(data.brightBlue);
             userPrompt();
-        }), (err, res) => {
-            if (err) {
-                return reject(err)
-            }else{
-                return resolve(res)
-        }
-    };
-}});
+        })
+    }
 
 const askAgain = () => {
     inquirer
@@ -54,7 +48,7 @@ const askAgain = () => {
                 console.clear();
                 userPrompt();
             } else {
-                process.exit();
+                exit();
             }
         })
 }
@@ -79,54 +73,55 @@ const userPrompt =  () => {
                         `Add Role`,
                         `Remove Role`,
                         `View All Employees By Manager`,
+                        `View Total Utilized Budget By Department`,
                         `EXIT`,
                     ]}
     ])
-        .then(async ({userSelect}) => {
+        .then(({userSelect}) => {
             if (userSelect === `View All Employees`){
-                await viewAllEmployees()
-                askAgain();
+            viewAllEmployees()
             }
             if (userSelect === `View All Employees By Department`){
-                await viewEmpByDept()
-                askAgain();
+            viewEmpByDept()
             }
             if (userSelect === `View All Employees By Manager`){
-                await viewEmpByMgr()
-                askAgain();
+            viewEmpByMgr()
             }
             if (userSelect === `Add Employee`){
-                await addEmp();
+            addEmp();
             }
             if (userSelect === `Remove Employee`){
-                await removeEmp();
+            removeEmp();
             }
             if (userSelect === `Update Employee role`){
-                await updateEmp();
+            updateEmp();
             }
             if (userSelect === `Update Employee Manager`){
-                await updateEmpMgr();
+            updateEmpMgr();
             }
             if (userSelect === `Add Department`){
-                await addDept();
+            addDept();
             }
             if (userSelect === `Remove Department`){
-                await removeDept();
+            removeDept();
             }
             if (userSelect === `Add Role`){
-                await addRole();
+            addRole();
             }
             if (userSelect === `Remove Role`){
-                await removeRole();
+            removeRole();
             }
             if (userSelect === `View All Department`){
-                await viewDept();
+            viewDept();
             }
             if (userSelect === `View All Role`){
-                await viewRoles();
+            viewRoles();
+            } 
+            if (userSelect === `View Total Utilized Budget By Department`){
+            viewBudget();
             } 
             if (userSelect === `EXIT`){
-                await exit();
+            exit();
             } 
 
         }) 
@@ -145,6 +140,7 @@ db.promise().query(
     LEFT JOIN employee manager ON employee.manager_id = manager.id;`)
 .then( ([rows,fields]) => {
     printTable(rows);
+    askAgain();
 });
 
 viewEmpByDept = () => 
@@ -157,6 +153,7 @@ db.promise().query(
     ORDER by department DESC`)
 .then( ([rows,fields]) => {
     printTable(rows);
+    askAgain();
 });
 
 viewEmpByMgr = () => 
@@ -171,6 +168,7 @@ db.promise().query(
     ORDER by manager DESC;`)
 .then( ([rows,fields]) => {
     printTable(rows);
+    askAgain();
 });
 
 addEmp = () => {
@@ -204,45 +202,45 @@ inquirer
 .then((answer) => {
     const employee = [answer.firstName, answer.lastName]
 
-        db.promise().query(`SELECT roles.id, roles.title FROM roles`)
-        .then( ([rows,fields]) => {
-            const roles = rows.map(({ id, title }) => ({ name: title, value: id }));
-            inquirer
-            .prompt([
-                {
-                    type: 'list',
-                    name: 'role',
-                    message: `What is the employee's role?`,
-                    choices: roles
-                }
-            ])
-            .then(answer => {
-                employee.push(answer.role);
-                db.promise().query(`SELECT * FROM employee`)
-                .then( ([rows,fields]) => {
-                    const managers = rows.map(({ id, first_name, last_name }) => ({ name: first_name + " " + last_name, value: id }));
-                    inquirer
-                    .prompt([
-                        {
-                            type: 'list',
-                            name: 'manager',
-                            message: `Who is the employee's manager?`,
-                            choices: managers
-                        }
-                    ])
-                    .then(answer => {
-                        employee.push(answer.manager);
-                        console.log("Employee has been added!".black.bgGreen)
-                        askAgain();
-                        db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id)
-                        VALUES (?, ?, ? ,?)`, employee, (err, result) => {
-                            if (err) {throw err}
-                        })
+    db.promise().query(`SELECT roles.id, roles.title FROM roles`)
+    .then( ([rows,fields]) => {
+        const roles = rows.map(({ id, title }) => ({ name: title, value: id }));
+        inquirer
+        .prompt([
+            {
+                type: 'list',
+                name: 'role',
+                message: `What is the employee's role?`,
+                choices: roles
+            }
+        ])
+        .then(answer => {
+            employee.push(answer.role);
+            db.promise().query(`SELECT * FROM employee`)
+            .then( ([rows,fields]) => {
+                const managers = rows.map(({ id, first_name, last_name }) => ({ name: first_name + " " + last_name, value: id }));
+                inquirer
+                .prompt([
+                    {
+                        type: 'list',
+                        name: 'manager',
+                        message: `Who is the employee's manager?`,
+                        choices: managers
+                    }
+                ])
+                .then(answer => {
+                    employee.push(answer.manager);
+                    console.log("Employee has been added!".black.bgGreen)
+                    askAgain();
+                    db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                    VALUES (?, ?, ? ,?)`, employee, (err, result) => {
+                        if (err) {throw err}
                     })
-                });
-            })
-        });
-    })};
+                })
+            });
+        })
+    });
+})};
 
 removeEmp = () => {
     db.query(`SELECT * FROM employee`, (err, data) => {
@@ -342,7 +340,6 @@ updateEmpMgr = () => {
                 .then(answer => {
                     const manager = answer.manager;
                     arr.unshift(manager);
-                    console.log(arr)
                     db.query(`UPDATE employee SET manager_id = ? WHERE id = ?`, arr, (err, result) => {
                         if (err) throw err;
                         console.log("Employee has been updated!".black.bgGreen);
@@ -395,7 +392,7 @@ addRole = () => {
             {
                 type: 'list',
                 name: 'name',
-                message: "Which department would is this role in?",
+                message: "Which department is this role in?",
                 choices: departments
             }
             ])
@@ -473,7 +470,7 @@ removeRole = () => {
 };
 
 viewDept = () => {
-    db.query(`SELECT * FROM department`, (err, data) => {
+    db.query(`SELECT department.name AS department FROM department`, (err, data) => {
         if (err) throw err;
         printTable(data);
         askAgain();
@@ -485,6 +482,18 @@ viewRoles = () => {
         roles.salary,
         department.name AS department
         FROM roles LEFT JOIN department ON roles.department_id = department.id;`, (err, data) => {
+        if (err) throw err;
+        printTable(data);
+        askAgain();
+    })
+}
+
+viewBudget = () => {
+    db.query(`SELECT department.name AS department,
+    SUM(roles.salary) as budget
+    FROM department
+    LEFT JOIN roles ON department_id = department.id
+    GROUP BY department.id;`, (err, data) => {
         if (err) throw err;
         printTable(data);
         askAgain();
@@ -509,4 +518,5 @@ exit = () => {
         process.exit();
     })
 }
-init();
+
+init()
